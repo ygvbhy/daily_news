@@ -17,7 +17,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 function buildHeaders(token: string) {
   return {
     "Content-Type": "application/json",
-    "x-admin-token": token
+    "x-admin-token": token,
   };
 }
 
@@ -41,7 +41,7 @@ export default function HomePage() {
 
   const activeCount = useMemo(
     () => keywords.filter((k) => k.active).length,
-    [keywords]
+    [keywords],
   );
 
   async function loadKeywords(adminToken: string) {
@@ -49,7 +49,7 @@ export default function HomePage() {
     setMessage(null);
     try {
       const res = await fetch(`${API_BASE}/api/keywords`, {
-        headers: buildHeaders(adminToken)
+        headers: buildHeaders(adminToken),
       });
       if (!res.ok) throw new Error("Unauthorized or API error");
       const data = (await res.json()) as ApiResponse;
@@ -70,14 +70,14 @@ export default function HomePage() {
     }
     setKeywords((prev) => [
       ...prev,
-      { id: `local-${Date.now()}`, term, active: true }
+      { id: `local-${Date.now()}`, term, active: true },
     ]);
     setNewTerm("");
   }
 
   function toggleKeyword(id: string) {
     setKeywords((prev) =>
-      prev.map((k) => (k.id === id ? { ...k, active: !k.active } : k))
+      prev.map((k) => (k.id === id ? { ...k, active: !k.active } : k)),
     );
   }
 
@@ -94,8 +94,8 @@ export default function HomePage() {
         method: "POST",
         headers: buildHeaders(token),
         body: JSON.stringify({
-          keywords: keywords.map((k) => ({ term: k.term, active: k.active }))
-        })
+          keywords: keywords.map((k) => ({ term: k.term, active: k.active })),
+        }),
       });
       if (!res.ok) throw new Error("Save failed");
       await loadKeywords(token);
@@ -168,7 +168,9 @@ export default function HomePage() {
         </div>
 
         <div className="mt-6 flex items-center justify-between text-sm text-slate-600">
-          <p>총 {keywords.length}개 · 활성 {activeCount}개</p>
+          <p>
+            총 {keywords.length}개 · 활성 {activeCount}개
+          </p>
           <button
             className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500 disabled:opacity-60"
             onClick={saveKeywords}

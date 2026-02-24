@@ -35,16 +35,19 @@ npm run dev:api
 ## 4) 핵심 파일 정리
 
 ### 공용/루트
+
 - `package.json` : 워크스페이스/스크립트
 - `.env.example` : 환경변수 템플릿
 - `README.md` : 전체 개요
 - `DEPLOYMENT.md` : 배포/운영 가이드
 
 ### FE (관리 UI)
+
 - `apps/web/src/app/page.tsx`
   - 키워드 CRUD UI (토큰 기반 접근)
 
 ### BE (API + 크론)
+
 - `apps/api/src/app/api/keywords/route.ts`
   - 키워드 조회/저장 API
 - `apps/api/src/app/api/cron/route.ts`
@@ -53,6 +56,7 @@ npm run dev:api
   - 관리자 토큰 검증
 
 ### 크롤러/리포트 로직
+
 - `packages/core/src/index.ts`
   - 크롤링 실행, 중복 제거, DB 저장
 - `packages/core/src/sources/naver.ts`
@@ -71,6 +75,7 @@ npm run dev:api
   - 리스크 키워드 관리
 
 ### DB
+
 - `packages/db/prisma/schema.prisma`
   - Keyword/Article 스키마
 - `packages/db/src/index.ts`
@@ -84,4 +89,3 @@ npm run dev:api
 4. URL + 제목 유사도 중복 제거
 5. DB 저장
 6. 최근 기사 이메일 리포트 발송
-

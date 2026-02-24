@@ -14,30 +14,54 @@ const payloadSchema = z.object({
     .max(200)
 });
 
+function withCors(req: NextRequest, res: NextResponse) {
+  const allowOrigin = process.env.CORS_ORIGIN || "*";
+  res.headers.set("Access-Control-Allow-Origin", allowOrigin);
+  res.headers.set("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+  res.headers.set(
+    "Access-Control-Allow-Headers",
+    "Content-Type, x-admin-token, Authorization"
+  );
+  if (allowOrigin !== "*") {
+    res.headers.set("Vary", "Origin");
+  }
+  return res;
+}
+
+export async function OPTIONS(req: NextRequest) {
+  return withCors(req, new NextResponse(null, { status: 204 }));
+}
+
 export async function GET(req: NextRequest) {
   const unauthorized = requireAdmin(req);
-  if (unauthorized) return unauthorized;
+  if (unauthorized) return withCors(req, unauthorized);
 
   const keywords = await listKeywords();
-  return NextResponse.json({
-    keywords: keywords.map((keyword) => ({
-      id: keyword.id,
-      term: keyword.term,
-      active: keyword.active
-    }))
-  });
+  return withCors(
+    req,
+    NextResponse.json({
+      keywords: keywords.map((keyword) => ({
+        id: keyword.id,
+        term: keyword.term,
+        active: keyword.active
+      }))
+    })
+  );
 }
 
 export async function POST(req: NextRequest) {
   const unauthorized = requireAdmin(req);
-  if (unauthorized) return unauthorized;
+  if (unauthorized) return withCors(req, unauthorized);
 
   const body = await req.json();
   const parsed = payloadSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
+    return withCors(
+      req,
+      NextResponse.json({ error: "Invalid payload" }, { status: 400 })
+    );
   }
 
   await replaceKeywords(parsed.data.keywords);
-  return NextResponse.json({ ok: true });
+  return withCors(req, NextResponse.json({ ok: true }));
 }
