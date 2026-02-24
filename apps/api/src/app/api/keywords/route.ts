@@ -14,17 +14,51 @@ const payloadSchema = z.object({
     .max(200)
 });
 
+function normalizeOrigin(value: string) {
+  return value.trim().replace(/\/$/, "");
+}
+
+function isAllowedOrigin(origin: string, allowedOrigins: string[]) {
+  return allowedOrigins.some((item) => {
+    if (item === "*") return true;
+    if (item.startsWith("*.")) {
+      const suffix = item.slice(1);
+      try {
+        const url = new URL(origin);
+        return url.hostname.endsWith(suffix);
+      } catch {
+        return false;
+      }
+    }
+    return normalizeOrigin(item) === normalizeOrigin(origin);
+  });
+}
+
+function resolveAllowOrigin(req: NextRequest) {
+  const configured = (process.env.CORS_ORIGIN || "*")
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+  const requestOrigin = req.headers.get("origin");
+
+  if (configured.includes("*")) return "*";
+  if (requestOrigin && isAllowedOrigin(requestOrigin, configured)) {
+    return requestOrigin;
+  }
+
+  return configured[0] || "*";
+}
+
 function withCors(req: NextRequest, res: NextResponse) {
-  const allowOrigin = process.env.CORS_ORIGIN || "*";
+  const allowOrigin = resolveAllowOrigin(req);
   res.headers.set("Access-Control-Allow-Origin", allowOrigin);
   res.headers.set("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
   res.headers.set(
     "Access-Control-Allow-Headers",
     "Content-Type, x-admin-token, Authorization"
   );
-  if (allowOrigin !== "*") {
-    res.headers.set("Vary", "Origin");
-  }
+  res.headers.set("Access-Control-Max-Age", "86400");
+  res.headers.set("Vary", "Origin");
   return res;
 }
 
