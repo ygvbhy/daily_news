@@ -1,13 +1,14 @@
 {
   "name": "@daily-news/db",
   "version": "0.1.0",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
   "private": true,
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "prisma:generate": "prisma generate",
-    "prisma:push": "prisma db push"
+    "prisma:push": "prisma db push",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@prisma/client": "^5.18.0"

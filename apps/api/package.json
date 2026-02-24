@@ -9,8 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@daily-news/core": "*",
-    "@daily-news/db": "*",
+    "@daily-news/core": "file:../../packages/core",
+    "@daily-news/db": "file:../../packages/db",
     "next": "^14.2.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
