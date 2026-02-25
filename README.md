@@ -10,6 +10,8 @@
 - 네이버 뉴스, Google 뉴스에서 **키워드 기반 기사**를 수집합니다.
 - 새로운 기사만 저장하고 **중복을 자동 제거**합니다.
 - 매일 **이메일 리포트**를 자동으로 발송합니다.
+- `Lark` 웹훅을 설정하면 같은 리포트를 Lark 봇으로도 함께 발송합니다.
+- 관리자 화면에서 버튼으로 **즉시 수동 발송**도 가능합니다.
 - 키워드는 **관리자 웹 화면**에서 직접 추가/수정 가능합니다.
 
 ---
@@ -105,10 +107,14 @@ npm run dev:api
 - `GOOGLE_NEWS_HL=ko`
 - `GOOGLE_NEWS_GL=KR`
 - `GOOGLE_NEWS_CEID=KR:ko`
+- `NAVER_PAGE_SIZE=100` (네이버 요청 1회당 건수)
+- `NAVER_MAX_FETCH_PER_KEYWORD=300` (키워드당 최대 수집량, 최대 1000)
 - `REPORT_WINDOW_HOURS=24`
 - `REPORT_MAX_ARTICLES=200`
 - `REPORT_RISK_TERMS=리콜,불매,논란,소송,저작권,유출`
 - `DEDUPE_TITLE_THRESHOLD=0.82`
+- `LARK_WEBHOOK_URL` (설정 시 Lark 봇 발송 활성화)
+- `LARK_MAX_TEXT_LENGTH=3500`
 
 ---
 
@@ -135,4 +141,3 @@ npm run dev:api
 
 - 배포/운영 가이드: `DEPLOYMENT.md`
 - 전체 구현 요약: `PROJECT_OVERVIEW.md`
-

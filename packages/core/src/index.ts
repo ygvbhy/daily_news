@@ -111,4 +111,4 @@ export async function runDailyCrawl(): Promise<CrawlResult> {
   };
 }
 
-export { runDailyReport } from "./reportRunner";
+export { runDailyEmailReport, runDailyLarkReport, runDailyReport } from "./reportRunner";

@@ -26,6 +26,8 @@ export default function HomePage() {
   const [keywords, setKeywords] = useState<Keyword[]>([]);
   const [newTerm, setNewTerm] = useState("");
   const [loading, setLoading] = useState(false);
+  const [sendingReport, setSendingReport] = useState(false);
+  const [sendingLark, setSendingLark] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -107,6 +109,66 @@ export default function HomePage() {
     }
   }
 
+  async function sendReportNow() {
+    if (!token) return;
+    setSendingReport(true);
+    setMessage(null);
+    try {
+      const res = await fetch(`${API_BASE}/api/report/send`, {
+        method: "POST",
+        headers: buildHeaders(token),
+      });
+      if (!res.ok) throw new Error("Report failed");
+      const data = (await res.json()) as {
+        crawl: { newArticles: number };
+        report: { sent: boolean; count: number; reason?: string | null };
+      };
+      if (!data.report.sent) {
+        setMessage(
+          `수집은 완료됐지만 메일 발송은 실패했습니다. reason=${data.report.reason ?? "unknown"}`,
+        );
+        return;
+      }
+      setMessage(
+        `수동 발송 완료: 신규 ${data.crawl.newArticles}건 수집, 리포트 ${data.report.count}건 발송`,
+      );
+    } catch (error) {
+      setMessage("수동 리포트 발송에 실패했습니다.");
+    } finally {
+      setSendingReport(false);
+    }
+  }
+
+  async function sendLarkNow() {
+    if (!token) return;
+    setSendingLark(true);
+    setMessage(null);
+    try {
+      const res = await fetch(`${API_BASE}/api/report/send-lark`, {
+        method: "POST",
+        headers: buildHeaders(token),
+      });
+      if (!res.ok) throw new Error("Lark report failed");
+      const data = (await res.json()) as {
+        crawl: { newArticles: number };
+        report: { sent: boolean; count: number; reason?: string | null };
+      };
+      if (!data.report.sent) {
+        setMessage(
+          `수집은 완료됐지만 Lark 전송은 실패했습니다. reason=${data.report.reason ?? "unknown"}`,
+        );
+        return;
+      }
+      setMessage(
+        `Lark 전송 완료: 신규 ${data.crawl.newArticles}건 수집, 리포트 ${data.report.count}건 전송`,
+      );
+    } catch {
+      setMessage("Lark 수동 전송에 실패했습니다.");
+    } finally {
+      setSendingLark(false);
+    }
+  }
+
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-5xl flex-col gap-6 px-6 py-12">
       <header className="space-y-2">
@@ -171,13 +233,29 @@ export default function HomePage() {
           <p>
             총 {keywords.length}개 · 활성 {activeCount}개
           </p>
-          <button
-            className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500 disabled:opacity-60"
-            onClick={saveKeywords}
-            disabled={!token || loading}
-          >
-            저장
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              className="rounded-lg bg-sky-600 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-500 disabled:opacity-60"
+              onClick={sendReportNow}
+              disabled={!token || loading || sendingReport || sendingLark}
+            >
+              지금 메일 발송
+            </button>
+            <button
+              className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-60"
+              onClick={sendLarkNow}
+              disabled={!token || loading || sendingReport || sendingLark}
+            >
+              지금 Lark 전송
+            </button>
+            <button
+              className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500 disabled:opacity-60"
+              onClick={saveKeywords}
+              disabled={!token || loading || sendingReport || sendingLark}
+            >
+              저장
+            </button>
+          </div>
         </div>
 
         <div className="mt-4 divide-y divide-slate-200 rounded-lg border border-slate-200">
